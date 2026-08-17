@@ -295,7 +295,7 @@ const PhotoTextTool = () => {
   const [font, setFont] = useState(FONTS[2].id);
   const [color, setColor] = useState('#ffffff');
   const [size, setSize] = useState(8);
-  const [outline, setOutline] = useState(true);
+  const [outline, setOutline] = useState(false);
   const canvasRef = useRef(null);
 
   const onFiles = (list) => {
