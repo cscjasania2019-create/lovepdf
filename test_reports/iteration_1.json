@@ -1,0 +1,31 @@
+{
+  "summary": "End-to-end verification of PDFPro Studio bug fix (PDF-to-Word OCR fallback for scanned PDFs) + light theme default. Backend: 6/6 pytest tests PASS (health, pdf-to-word text, pdf-to-word scanned+OCR, pdf-to-excel scanned+OCR, protect, repair). Frontend UI: real upload via browser through /tool/pdf-to-word for BOTH text-based and scanned PDFs successfully downloaded valid .docx files with correct content. Scanned PDF docx contained OCR text 'SCANNED DOCUMENT TEST\\nThistext is inside an image only' (54 chars). Text PDF docx contained 'Hello World - This is a text PDF...' (75 chars). Light mode is default on fresh visit (html has no 'dark' class). Theme toggle switches to dark correctly. Merge PDF (client-side) also verified end-to-end (downloaded valid %PDF file).",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Homepage", "issues": ["Only 18 unique /tool/* tool cards rendered on landing page though mock.js defines 26 tools. Missing tools: pdf-to-ppt, ppt-to-pdf, html-to-pdf, remove-pages, ocr-pdf, repair-pdf, compare-pdf, pdf-to-pdfa. All tools ARE routable via /tool/{slug} and work; only the landing card grid appears filtered/limited. Verify against spec that requested '26 tool cards' on homepage."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/test_pdf_tools.py", "/app/test_reports/pytest/pytest_results.xml"],
+  "action_items": [
+    "OPTIONAL/INFO: Homepage tool grid shows 18 of 26 tools. If spec truly wants all 26 as cards, expose the remaining 8 (pdf-to-ppt, ppt-to-pdf, html-to-pdf, remove-pages, ocr-pdf, repair-pdf, compare-pdf, pdf-to-pdfa) on the landing page. All 26 slugs already work via direct /tool/{slug} URLs."
+  ],
+  "critical_code_review_comments": [
+    "pdf_tools.py: _scanned_pdf_to_docx uses force_ocr=True which overwrites any existing text layer — fine because it is only called when _has_text_layer() returned false; correct branching.",
+    "pdf_tools.py health endpoint reports qpdf:false — not required by any current tool but worth installing if PDF/A or unlock robustness is expanded.",
+    "ToolPage.jsx line 213-216: for the 'protect' endpoint the field password is appended AFTER the throw check, which is fine; but the check `slug === 'protect-pdf'` won't fire for other future password-required tools. Minor.",
+    "Backend endpoints do not enforce file size/type limits — potential DoS vector for large uploads. Not a bug for MVP but worth noting."
+  ],
+  "updated_files": ["/app/backend/tests/test_pdf_tools.py"],
+  "success_rate": {"backend": "100% (6/6)", "frontend": "100% of critical flows (PDF-to-Word text, PDF-to-Word scanned OCR, light default, dark toggle, Merge)"},
+  "seed_data_creation": "Used pre-existing /tmp/text.pdf (text-based) and /tmp/scan.pdf (image-only) test fixtures.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Backend regression suite at /app/backend/tests/test_pdf_tools.py covers health + pdf-to-word (text & scanned) + pdf-to-excel (scanned) + protect + repair. Run with: pytest /app/backend/tests/test_pdf_tools.py -v. Test PDFs at /tmp/text.pdf and /tmp/scan.pdf. UI flow: ToolPage /tool/pdf-to-word — click convert triggers server call, then user must click the 'Download {name}.docx' button in the result view for the actual download (not the initial convert button).",
+  "rca of the issue": "N/A — original bug (pdf2docx failing on scanned/image-only PDFs) has been correctly fixed by (a) _has_text_layer() detecting missing text via pdfplumber and (b) _scanned_pdf_to_docx() running ocrmypdf with sidecar and building a python-docx Document from recognized text. Verified working via real UI upload + backend pytest. Same OCR fallback applied to pdf-to-excel is also confirmed working."
+}
