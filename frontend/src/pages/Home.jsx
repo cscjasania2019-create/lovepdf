@@ -48,7 +48,7 @@ const Home = () => {
             <p className="reveal text-base sm:text-lg text-slate-500 dark:text-slate-400 mt-5 max-w-2xl mx-auto leading-relaxed">
               Merge, split, compress, convert and edit your documents in seconds. Fast, secure and delightfully simple — on any device.
             </p>
-            <div className="reveal mt-8 max-w-xl mx-auto relative">
+            <div className="reveal mt-8 max-w-xl mx-auto relative z-40">
               <Search className="absolute left-4 top-6 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 value={query}
@@ -58,25 +58,37 @@ const Home = () => {
                 data-testid="hero-search-input"
               />
               {query.trim() && (
-                <div data-testid="search-suggestions" className="absolute left-0 right-0 top-full mt-2 z-30 bg-white dark:bg-[#10141f] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl p-2 text-left max-h-80 overflow-y-auto">
-                  {filtered.length === 0 ? (
-                    <p className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">No tool found for "{query}"</p>
-                  ) : (
-                    filtered.slice(0, 8).map((t) => {
-                      const SIcon = Icons[t.icon] || Icons.FileText;
-                      return (
-                        <button key={t.slug} data-testid={`search-result-${t.slug}`} onClick={() => navigate(`/tool/${t.slug}`)}
-                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group">
-                          <span className={`grid place-items-center w-9 h-9 rounded-lg shrink-0 ${ICON_TILE[t.color] || ICON_TILE.rose}`}><SIcon className="w-4 h-4" /></span>
-                          <span className="flex-1 min-w-0">
-                            <span className="block text-sm font-semibold text-slate-800 dark:text-slate-100">{t.name}</span>
-                            <span className="block text-xs text-slate-500 dark:text-slate-400 truncate">{t.desc}</span>
-                          </span>
-                          <Icons.ArrowRight className="w-4 h-4 text-rose-500 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all" />
-                        </button>
-                      );
-                    })
-                  )}
+                <div data-testid="search-suggestions" className="absolute left-0 right-0 top-full mt-3 z-30 bg-white dark:bg-[#10141f] rounded-2xl border border-slate-200 dark:border-white/10 shadow-[0_24px_60px_-15px_rgba(15,23,42,0.25)] dark:shadow-[0_24px_60px_-15px_rgba(0,0,0,0.7)] ring-1 ring-black/[0.03] overflow-hidden text-left reveal">
+                  <div className="flex items-center justify-between px-4 pt-3 pb-2">
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 dark:text-slate-500">Search results</span>
+                    {filtered.length > 0 && <span className="text-[10px] font-bold text-rose-500 bg-rose-500/10 px-2 py-0.5 rounded-full">{filtered.length} tool{filtered.length > 1 ? 's' : ''}</span>}
+                  </div>
+                  <div className="max-h-80 overflow-y-auto px-2 pb-2 space-y-0.5">
+                    {filtered.length === 0 ? (
+                      <div className="px-4 py-8 text-center">
+                        <Icons.SearchX className="w-8 h-8 mx-auto text-slate-300 dark:text-slate-600 mb-2" />
+                        <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">No tool found for "{query}"</p>
+                        <p className="text-xs text-slate-400 mt-1">Try "merge", "compress" or "word"</p>
+                      </div>
+                    ) : (
+                      filtered.slice(0, 8).map((t) => {
+                        const SIcon = Icons[t.icon] || Icons.FileText;
+                        const catLabel = (CATEGORIES.find((c) => c.id === t.category) || {}).label;
+                        return (
+                          <button key={t.slug} data-testid={`search-result-${t.slug}`} onClick={() => navigate(`/tool/${t.slug}`)}
+                            className="w-full flex items-center gap-3.5 px-3 py-3 rounded-xl hover:bg-rose-50/80 dark:hover:bg-rose-500/[0.08] border border-transparent hover:border-rose-200/70 dark:hover:border-rose-500/20 transition-all group">
+                            <span className={`grid place-items-center w-10 h-10 rounded-xl shrink-0 ${ICON_TILE[t.color] || ICON_TILE.rose} group-hover:scale-110 transition-transform`}><SIcon className="w-5 h-5" /></span>
+                            <span className="flex-1 min-w-0">
+                              <span className="block text-sm font-bold text-slate-800 dark:text-slate-100 group-hover:text-rose-500 transition-colors">{t.name}</span>
+                              <span className="block text-xs text-slate-500 dark:text-slate-400 truncate">{t.desc}</span>
+                            </span>
+                            {catLabel && <span className="hidden sm:block text-[10px] font-semibold text-slate-400 dark:text-slate-500 bg-slate-100 dark:bg-white/5 px-2 py-1 rounded-lg shrink-0">{catLabel}</span>}
+                            <Icons.ArrowRight className="w-4 h-4 text-rose-500 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all shrink-0" />
+                          </button>
+                        );
+                      })
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -160,7 +172,7 @@ const Home = () => {
       <section id="features" className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-20 scroll-mt-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-rose-500">Why PDFPro</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-rose-500">Why LovePDF</span>
             <h2 className="font-display font-bold text-3xl sm:text-4xl mt-3">Built for speed, trust and joy</h2>
             <p className="text-slate-500 dark:text-slate-400 mt-4 leading-relaxed">We obsess over the tiny details so your PDF chores feel effortless — and even a little fun.</p>
             <ul className="mt-6 space-y-3">

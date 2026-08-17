@@ -1,0 +1,26 @@
+{
+  "summary": "Verified the user-reported 'result (1).docx cannot be opened by Word' bug via real browser download flow using Playwright. Both text.pdf and scan.pdf UI conversions now produce correctly named (text.docx / scan.docx) and structurally valid .docx files (zipfile.testzip() is None, python-docx opens cleanly, expected text present). Backend also validated: /api/pdf/pdf-to-word returns proper Content-Disposition and access-control-expose-headers: Content-Disposition when Origin header is present; pdf-to-excel with scanned PDF still returns a valid xlsx.",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {"ui_bugs": [], "integration_issues": [], "design_issues": []},
+  "test_report_links": [
+    "/app/backend/tests/test_pdf_to_word_download.py",
+    "/app/tests/ui_pdf_to_word.py",
+    "/app/test_reports/pytest/pdf_to_word.xml"
+  ],
+  "action_items": [],
+  "critical_code_review_comments": [
+    "ToolPage.jsx is ~680 lines and contains many engine branches + ResultView; consider splitting per-engine option panels into subcomponents for maintainability.",
+    "pdf_to_word endpoint swallows pdf2docx exceptions silently; consider logging so future corrupt-docx incidents are traceable in backend logs.",
+    "_scanned_pdf_to_docx uses force_ocr=True even when a partial text layer exists; for mixed PDFs this may discard existing text. Current fallback logic (pdf2docx first) mitigates but worth documenting."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_pdf_to_word_download.py",
+    "/app/tests/ui_pdf_to_word.py"
+  ],
+  "success_rate": {"backend": "100% (3/3)", "frontend": "100% (2/2 UI download flows)"},
+  "seed_data_creation": "Used pre-existing /tmp/text.pdf and /tmp/scan.pdf.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Playwright is now installed in /root/.venv with chromium browser at /pw-browsers. Run UI test via: PLAYWRIGHT_BROWSERS_PATH=/pw-browsers python /app/tests/ui_pdf_to_word.py. Backend tests: pytest /app/backend/tests/test_pdf_to_word_download.py -v. IMPORTANT: backend expose_headers is a CORS response header - requests must set Origin header to observe it.",
+  "rca of the issue": "Root cause was two-fold: (1) browser fetch received Content-Disposition header but expose_headers didn't include it, so JS couldn't read the filename and fell back to 'result' - fixed via CORSMiddleware expose_headers=['Content-Disposition']; (2) OCR-produced docx sometimes contained illegal XML control chars that caused MS Word to reject the file - fixed via regex stripping in _scanned_pdf_to_docx plus a _docx_is_valid fallback path. Verified in real browser download flow: filenames now text.docx / scan.docx, zip integrity passes, python-docx opens files, expected text present."
+}

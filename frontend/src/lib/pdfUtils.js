@@ -34,9 +34,28 @@ export const getPageCount = async (file) => {
 export const mergePdfs = async (files) => {
   const out = await PDFDocument.create();
   for (const f of files) {
-    const src = await PDFDocument.load(await readFile(f), { ignoreEncryption: true });
-    const pages = await out.copyPages(src, src.getPageIndices());
-    pages.forEach((p) => out.addPage(p));
+    if (f.type && f.type.startsWith('image/')) {
+      let bytes = new Uint8Array(await readFile(f));
+      let img;
+      if (f.type === 'image/png') img = await out.embedPng(bytes);
+      else if (f.type === 'image/jpeg') img = await out.embedJpg(bytes);
+      else {
+        const url = URL.createObjectURL(f);
+        const el = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = url; });
+        const canvas = document.createElement('canvas');
+        canvas.width = el.naturalWidth; canvas.height = el.naturalHeight;
+        canvas.getContext('2d').drawImage(el, 0, 0);
+        URL.revokeObjectURL(url);
+        const dataUrl = canvas.toDataURL('image/png');
+        img = await out.embedPng(dataUrl);
+      }
+      const page = out.addPage([img.width, img.height]);
+      page.drawImage(img, { x: 0, y: 0, width: img.width, height: img.height });
+    } else {
+      const src = await PDFDocument.load(await readFile(f), { ignoreEncryption: true });
+      const pages = await out.copyPages(src, src.getPageIndices());
+      pages.forEach((p) => out.addPage(p));
+    }
   }
   return out.save();
 };

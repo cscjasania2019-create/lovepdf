@@ -80,8 +80,10 @@ const CompressTool = () => {
       if (!res.ok) { const j = await res.json().catch(() => null); throw new Error(j?.detail || 'Compression failed.'); }
       const blob = await res.blob();
       const cd = res.headers.get('Content-Disposition') || '';
-      const m = cd.match(/filename="?([^"]+)"?/);
-      setResult({ blob, name: m ? m[1] : 'compressed.jpg', url: URL.createObjectURL(blob) });
+      const m = cd.match(/filename="?([^";]+)"?/);
+      const r = { blob, name: m ? m[1] : 'compressed.jpg', url: URL.createObjectURL(blob) };
+      setResult(r);
+      downloadBlob(r.blob, r.name);
     } catch (e) { setError(e.message); }
     setBusy(false);
   };
@@ -143,7 +145,9 @@ const RemoveBgTool = () => {
       const res = await fetch(`${API}/remove-bg`, { method: 'POST', body: fd });
       if (!res.ok) { const j = await res.json().catch(() => null); throw new Error(j?.detail || 'Background removal failed.'); }
       const blob = await res.blob();
-      setResult({ blob, name: file.name.replace(/\.[^.]+$/, '') + '_no_bg.png', url: URL.createObjectURL(blob) });
+      const r = { blob, name: file.name.replace(/\.[^.]+$/, '') + '_no_bg.png', url: URL.createObjectURL(blob) };
+      setResult(r);
+      downloadBlob(r.blob, r.name);
     } catch (e) { setError(e.message); }
     setBusy(false);
   };
@@ -220,7 +224,9 @@ const CropTool = () => {
       ctx.drawImage(img, areaPx.x, areaPx.y, areaPx.width, areaPx.height, 0, 0, outW, outH);
       const isPng = /png$/i.test(file.type);
       const blob = await new Promise((r) => canvas.toBlob(r, isPng ? 'image/png' : 'image/jpeg', 0.92));
-      setResult({ blob, name: file.name.replace(/\.[^.]+$/, '') + `_cropped.${isPng ? 'png' : 'jpg'}`, url: URL.createObjectURL(blob), w: outW, h: outH });
+      const rr = { blob, name: file.name.replace(/\.[^.]+$/, '') + `_cropped.${isPng ? 'png' : 'jpg'}`, url: URL.createObjectURL(blob), w: outW, h: outH };
+      setResult(rr);
+      downloadBlob(rr.blob, rr.name);
     } catch (e) { setError('Could not crop this image.'); }
   };
 

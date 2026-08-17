@@ -6,7 +6,7 @@ import { useTheme } from '../context/ThemeContext';
 import { TOOLS, ICON_TILE, CATEGORIES } from '../mock';
 
 export const Logo = ({ compact = false }) => (
-  <Link to="/" className="flex items-center gap-2.5 group">
+  <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-2.5 group" data-testid="logo-home-link">
     <div className="relative">
       <div className="absolute inset-0 rounded-xl bg-rose-500/40 blur-md opacity-0 group-hover:opacity-100 transition-opacity" />
       <div className="relative grid place-items-center w-9 h-9 rounded-xl btn-primary text-white">
@@ -15,7 +15,7 @@ export const Logo = ({ compact = false }) => (
     </div>
     {!compact && (
       <span className="font-display font-extrabold text-lg tracking-tight text-slate-900 dark:text-white">
-        PDF<span className="brand-gradient-text">Pro</span>
+        Love<span className="brand-gradient-text">PDF</span>
       </span>
     )}
   </Link>

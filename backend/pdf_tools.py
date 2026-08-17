@@ -154,6 +154,7 @@ def _ocr_if_scanned(src: Path, job: Path, lang: str = "eng") -> Path:
 
 def _scanned_pdf_to_docx(src: Path, job: Path, out: Path, lang: str):
     """OCR a scanned PDF and build an editable Word document from the recognized text."""
+    import re
     import ocrmypdf
     from docx import Document
     sidecar = job / "ocr_text.txt"
@@ -163,15 +164,26 @@ def _scanned_pdf_to_docx(src: Path, job: Path, out: Path, lang: str):
     text = sidecar.read_text(encoding="utf-8", errors="ignore") if sidecar.exists() else ""
     if not text.strip():
         raise HTTPException(422, "No readable text found in this scanned PDF.")
+    illegal = re.compile(r"[\x00-\x08\x0b\x0e-\x1f\x7f-\x9f\ufffe\uffff]")
     doc = Document()
     pages = text.split("\f")
     for pi, page in enumerate(pages):
         for line in page.splitlines():
-            if line.strip():
-                doc.add_paragraph(line)
+            clean = illegal.sub("", line).strip()
+            if clean:
+                doc.add_paragraph(clean)
         if pi < len(pages) - 1 and page.strip():
             doc.add_page_break()
     doc.save(str(out))
+
+
+def _docx_is_valid(path: Path) -> bool:
+    try:
+        from docx import Document
+        Document(str(path))
+        return True
+    except Exception:
+        return False
 
 
 # ---------- PDF -> Word ----------
@@ -183,13 +195,19 @@ async def pdf_to_word(background_tasks: BackgroundTasks, file: UploadFile = File
         src = await _save_upload(file, job)
         out = job / (src.stem + ".docx")
         if _has_text_layer(src):
-            cv = Converter(str(src))
-            cv.convert(str(out))
-            cv.close()
+            try:
+                cv = Converter(str(src))
+                cv.convert(str(out))
+                cv.close()
+            except Exception:
+                out.unlink(missing_ok=True)
+            if not out.exists() or not _docx_is_valid(out):
+                out.unlink(missing_ok=True)
+                _scanned_pdf_to_docx(src, job, out, lang)
         else:
             _scanned_pdf_to_docx(src, job, out, lang)
-        if not out.exists():
-            raise HTTPException(500, "Conversion produced no output.")
+        if not out.exists() or not _docx_is_valid(out):
+            raise HTTPException(500, "Conversion produced an unreadable document. Please try another file.")
         return _respond(out, src.stem + ".docx", "docx", job, background_tasks)
     except HTTPException:
         _cleanup(job); raise

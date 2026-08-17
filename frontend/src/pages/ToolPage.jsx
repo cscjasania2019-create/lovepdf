@@ -252,8 +252,16 @@ const ToolPage = () => {
       } else {
         const blob = await res.blob();
         const cd = res.headers.get('Content-Disposition') || '';
-        const m = cd.match(/filename="?([^"]+)"?/);
-        const name = m ? m[1] : 'result';
+        const m = cd.match(/filename="?([^";]+)"?/);
+        const extMap = {
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'docx',
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'xlsx',
+          'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'pptx',
+          'application/pdf': 'pdf', 'application/zip': 'zip', 'text/plain': 'txt',
+        };
+        const fallbackExt = extMap[blob.type] || 'pdf';
+        const base0 = (files[0]?.name || 'result').replace(/\.[^.]+$/, '');
+        const name = m ? m[1] : `${base0}.${fallbackExt}`;
         setResult({ blob, name });
       }
     } catch (e) {
@@ -337,10 +345,10 @@ const ToolPage = () => {
           <div className="space-y-6">
             {files.length === 0 ? (
               <FileDrop
-                accept={serverCfg ? serverCfg.accept : (isImageInput ? 'image/*' : '.pdf')}
+                accept={serverCfg ? serverCfg.accept : (isImageInput ? 'image/*' : (slug === 'merge-pdf' ? '.pdf,image/*' : '.pdf'))}
                 multiple={isMulti}
                 onFiles={onFiles}
-                label={isImageInput ? 'Select images' : (isMulti ? 'Select PDF files' : (serverCfg && serverCfg.accept !== '.pdf' ? 'Select file' : 'Select PDF file'))}
+                label={isImageInput ? 'Select images' : (slug === 'merge-pdf' ? 'Select PDFs & images' : (isMulti ? 'Select PDF files' : (serverCfg && serverCfg.accept !== '.pdf' ? 'Select file' : 'Select PDF file')))}
               />
             ) : (
               <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] p-5 sm:p-7 space-y-5">
@@ -359,7 +367,7 @@ const ToolPage = () => {
                         </div>
                       </div>
                     ))}
-                    <FileDrop accept={isImageInput ? 'image/*' : '.pdf'} multiple onFiles={onFiles} label="Add more" hint="drop to append" />
+                    <FileDrop accept={isImageInput ? 'image/*' : (slug === 'merge-pdf' ? '.pdf,image/*' : '.pdf')} multiple onFiles={onFiles} label="Add more" hint="drop to append" />
                   </div>
                 )}
 
@@ -584,6 +592,13 @@ const ResultView = ({ result, onReset }) => {
   const isParts = !!result.parts;
   const isBlob = !!result.blob;
   const isCompare = !!result.compare;
+  useEffect(() => {
+    if (result.autoDone || isCompare || isImages || isParts) return;
+    result.autoDone = true;
+    if (isBlob) pdf.download(result.blob, result.name, result.blob.type);
+    else if (result.bytes) pdf.download(result.bytes, result.name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const meta = result.meta;
   const fmt = (b) => (b >= 1024 * 1024 ? `${(b / 1024 / 1024).toFixed(2)} MB` : `${(b / 1024).toFixed(0)} KB`);
   const downloadAllImages = () => result.images.forEach((im) => pdf.download(im.blob, im.name, 'image/jpeg'));

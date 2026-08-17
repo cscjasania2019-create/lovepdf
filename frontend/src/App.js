@@ -1,17 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import Home from './pages/Home';
 import ToolPage from './pages/ToolPage';
 import SignPage from './pages/SignPage';
 import ImageToolPage from './pages/ImageToolPage';
 
+if ('scrollRestoration' in window.history) window.history.scrollRestoration = 'manual';
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+  return null;
+};
+
 function App() {
   return (
     <ThemeProvider>
       <div className="App">
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/tool/sign-pdf" element={<SignPage />} />

@@ -14,7 +14,7 @@ export const CATEGORIES = [
 ];
 
 export const TOOLS = [
-  { slug: 'merge-pdf', name: 'Merge PDF', desc: 'Combine multiple PDFs into one single document in the order you want.', icon: 'Combine', color: 'rose', category: 'organize', engine: 'merge', ready: true },
+  { slug: 'merge-pdf', name: 'Merge PDF', desc: 'Combine PDFs and images (JPG, PNG) into one single document in the order you want.', icon: 'Combine', color: 'rose', category: 'organize', engine: 'merge', ready: true },
   { slug: 'split-pdf', name: 'Split PDF', desc: 'Extract page ranges or split one PDF into several separate files.', icon: 'Scissors', color: 'amber', category: 'organize', engine: 'split', ready: true },
   { slug: 'compress-pdf', name: 'Compress PDF', desc: 'Reduce file size while keeping the best possible quality.', icon: 'Minimize2', color: 'emerald', category: 'optimize', engine: 'compress', ready: true },
   { slug: 'organize-pdf', name: 'Organize PDF', desc: 'Reorder, rotate and delete pages to arrange your document.', icon: 'LayoutGrid', color: 'violet', category: 'organize', engine: 'organize', ready: true },
@@ -78,7 +78,7 @@ export const FAQS = [
   { q: 'Do I need to create an account?', a: 'No account is required to use the core tools. You can start merging, splitting and converting right away, for free.' },
   { q: 'Is there a file size or count limit?', a: 'For the browser based tools you can process as many files as your device can comfortably handle. Very large batches simply take a little longer.' },
   { q: 'Which formats are supported?', a: 'PDF is at the heart of everything, plus JPG, PNG and popular Office formats like Word, Excel and PowerPoint through our converters.' },
-  { q: 'Does it work on mobile?', a: 'Absolutely. PDFPro Studio is fully responsive and works across desktop, tablet and mobile browsers.' },
+  { q: 'Does it work on mobile?', a: 'Absolutely. LovePDF is fully responsive and works across desktop, tablet and mobile browsers.' },
 ];
 
 export const ICON_TILE = {

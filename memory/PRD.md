@@ -16,6 +16,14 @@ ilovepdf-style PDF tools website (repo: sanjusaharan10704-svg/LOVEPDF). Bug fix 
 - System deps recorded in /app/.emergent/system_deps.txt (libreoffice, ghostscript, tesseract-ocr, poppler-utils)
 
 ## Implemented (June 2026)
+### Phase C — UX round (testing agent verified 100%)
+- Merge PDF ab PDFs + images (JPG/PNG/WebP) mix accept karta hai (images full pages bante hain)
+- Auto-download on completion (download button bhi rehta hai) — ToolPage + image tools
+- Word download bug fixed: CORS expose Content-Disposition, OCR text XML-sanitize, pdf2docx output validation + OCR fallback
+- Hero search suggestions dropdown (solid bg, z-40 stacking fix, polished look with category chips)
+- Header: Image Tools dropdown (NEW badge), All Tools grouped by category, logo→home+scroll-top
+- ScrollToTop on route change/refresh; rebrand PDFPro → LovePDF (logo, footer, title); outline default off in photo-text
+
 ### Phase B — File Preview + Image Tools (testing agent verified 100%)
 - File Preview: PDF first-page render + image preview before processing (ToolPage single + multi-file thumbnails via MultiThumb)
 - Compress Image (/tool/compress-image): backend Pillow, quality slider + max-width presets, before/after size
