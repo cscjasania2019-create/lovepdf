@@ -10,6 +10,7 @@ export const CATEGORIES = [
   { id: 'convert-from', label: 'Convert from PDF' },
   { id: 'edit', label: 'Edit' },
   { id: 'security', label: 'Security' },
+  { id: 'image', label: 'Image tools' },
 ];
 
 export const TOOLS = [
@@ -39,11 +40,15 @@ export const TOOLS = [
   { slug: 'crop-pdf', name: 'Crop PDF', desc: 'Trim margins and crop the visible area of your pages.', icon: 'Crop', color: 'teal', category: 'edit', engine: 'crop', ready: false },
   { slug: 'compare-pdf', name: 'Compare PDF', desc: 'Spot the differences between two PDF documents.', icon: 'GitCompare', color: 'sky', category: 'edit', engine: 'compare', ready: false },
   { slug: 'pdf-to-pdfa', name: 'PDF to PDF/A', desc: 'Convert PDF to PDF/A for long term archiving.', icon: 'Archive', color: 'slate', category: 'optimize', engine: 'pdfa', ready: false },
+  { slug: 'compress-image', name: 'Compress Image', desc: 'Reduce JPG, PNG or WebP file size while keeping great quality.', icon: 'ImageDown', color: 'emerald', category: 'image', engine: 'img-compress', ready: true },
+  { slug: 'crop-image', name: 'Crop Image', desc: 'Crop photos to custom dimensions or preset sizes like square and 16:9.', icon: 'Crop', color: 'orange', category: 'image', engine: 'img-crop', ready: true },
+  { slug: 'remove-background', name: 'Remove Background', desc: 'Automatically remove the background from any photo with AI.', icon: 'Eraser', color: 'violet', category: 'image', engine: 'img-removebg', ready: true },
+  { slug: 'photo-text', name: 'Photo Name & DOB', desc: 'Add a name, date of birth or any text on a photo with fonts and colors.', icon: 'Baby', color: 'rose', category: 'image', engine: 'img-text', ready: true },
 ];
 
 export const STATS = [
   { value: '5.2B+', label: 'PDFs processed' },
-  { value: '26', label: 'Powerful tools' },
+  { value: '30', label: 'Powerful tools' },
   { value: '100%', label: 'Private & secure' },
   { value: '4.9/5', label: 'User rating' },
 ];

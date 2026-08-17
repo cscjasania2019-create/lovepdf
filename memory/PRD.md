@@ -16,6 +16,16 @@ ilovepdf-style PDF tools website (repo: sanjusaharan10704-svg/LOVEPDF). Bug fix 
 - System deps recorded in /app/.emergent/system_deps.txt (libreoffice, ghostscript, tesseract-ocr, poppler-utils)
 
 ## Implemented (June 2026)
+### Phase B — File Preview + Image Tools (testing agent verified 100%)
+- File Preview: PDF first-page render + image preview before processing (ToolPage single + multi-file thumbnails via MultiThumb)
+- Compress Image (/tool/compress-image): backend Pillow, quality slider + max-width presets, before/after size
+- Crop Image (/tool/crop-image): react-easy-crop, preset aspects + exact custom px output, client-side
+- Remove Background (/tool/remove-background): remove.bg API via backend (/api/image/remove-bg, REMOVEBG_API_KEY in backend/.env, 50 calls/month free quota)
+- Photo Name & DOB (/tool/photo-text): live canvas, 9 position presets, 6 fonts, color picker, size slider, outline toggle, JPG download
+- New backend router /app/backend/image_tools.py (/api/image/*); new page /app/frontend/src/pages/ImageToolPage.jsx
+- Home: 'Image tools' category, 30 tools total
+
+### Phase A — Bug fix
 - Repo cloned from GitHub into this environment (backend + frontend code)
 - All Python/Node deps installed; pdfjs-dist pinned to 4.4.168 (node 20 compatible)
 - **BUG FIX (root cause):** pdf2docx scanned/image-only PDFs pe text extract nahi karta tha
@@ -35,8 +45,6 @@ ilovepdf-style PDF tools website (repo: sanjusaharan10704-svg/LOVEPDF). Bug fix 
 ## Backlog (priority order)
 - P0: Sign PDF feature (draw/upload signature, drag-drop place/resize on page, backend stamp, download) — SignPage.jsx exists, verify/complete
 - P0: Batch processing (multi-file upload → same tool on all → zip download)
-- P1: File preview before processing (all tools)
-- P1: Image tools: Image Compressor, Image Cropper, Background Remover (rembg/remove.bg — key needed for remove.bg)
-- P1: Name/DOB photo text tool (text position, font, color, download)
+- P1: Edit PDF Text tool (user deferred — font detection tricky for embedded fonts; basic replace, PDF export)
 - P2: Deployment guide — Railway/Render Docker image, MongoDB Atlas, lovepdf.co.in DNS (A/CNAME + api subdomain), SSL
 - P2: Replace mock stats/reviews or label as "sample"

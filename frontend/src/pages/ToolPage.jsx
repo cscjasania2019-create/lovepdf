@@ -20,6 +20,24 @@ const positions = [
   { id: 'top-right', label: 'Top right' },
 ];
 
+const MultiThumb = ({ file }) => {
+  const [src, setSrc] = useState(null);
+  useEffect(() => {
+    let alive = true;
+    if (file.type && file.type.startsWith('image/')) {
+      const u = URL.createObjectURL(file);
+      setSrc(u);
+      return () => URL.revokeObjectURL(u);
+    }
+    if (/\.pdf$/i.test(file.name || '')) {
+      pdf.renderPageImage(file, 0, 120).then((p) => { if (alive) setSrc(p.dataUrl); }).catch(() => {});
+    }
+    return () => { alive = false; };
+  }, [file]);
+  if (!src) return <Icons.FileText className="w-5 h-5 text-rose-500 shrink-0" />;
+  return <img src={src} alt="" className="w-10 h-12 object-cover rounded border border-slate-200 dark:border-white/10 shrink-0" />;
+};
+
 const ToolPage = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -37,6 +55,7 @@ const ToolPage = () => {
   const [progress, setProgress] = useState(0);
   const [opts, setOpts] = useState({ ranges: '1', position: 'bottom-center', start: 1, wtext: 'CONFIDENTIAL', opacity: 0.25, angle: 90, quality: 2, targetVal: 200, targetUnit: 'KB', password: '', lang: 'eng', margin: 5, url: '', html: '' });
   const [file2, setFile2] = useState(null);
+  const [preview, setPreview] = useState(null);
 
   const serverCfg = SERVER_TOOLS[slug];
 
@@ -57,6 +76,12 @@ const ToolPage = () => {
     } else {
       const f = list[0];
       setFiles([f]);
+      setPreview(null);
+      if (f.type && f.type.startsWith('image/')) {
+        setPreview(URL.createObjectURL(f));
+      } else if (/\.pdf$/i.test(f.name || '')) {
+        pdf.renderPageImage(f, 0, 420).then((p) => setPreview(p.dataUrl)).catch(() => {});
+      }
       if (!isImageInput && needsThumbs) {
         setBusy(true);
         try {
@@ -272,7 +297,7 @@ const ToolPage = () => {
             </button>
           </div>
         ) : result ? (
-          <ResultView result={result} onReset={() => { setResult(null); setFiles([]); setFile2(null); setThumbs([]); }} />
+          <ResultView result={result} onReset={() => { setResult(null); setFiles([]); setFile2(null); setThumbs([]); setPreview(null); }} />
         ) : (serverCfg && serverCfg.kind === 'html') ? (
           <div className="rounded-3xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/[0.03] p-5 sm:p-7 space-y-5">
             <Field label="Webpage URL">
@@ -324,7 +349,7 @@ const ToolPage = () => {
                   <div className="space-y-2">
                     {files.map((f, i) => (
                       <div key={i} className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] px-4 py-3">
-                        <Icons.FileText className="w-5 h-5 text-rose-500 shrink-0" />
+                        <MultiThumb file={f} />
                         <span className="text-sm truncate flex-1">{f.name}</span>
                         <span className="text-xs text-slate-400">{(f.size / 1024).toFixed(0)} KB</span>
                         <div className="flex items-center gap-1">
@@ -340,11 +365,18 @@ const ToolPage = () => {
 
                 {/* Single file summary */}
                 {!isMulti && (
-                  <div className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] px-4 py-3">
-                    <Icons.FileText className="w-5 h-5 text-rose-500" />
-                    <span className="text-sm truncate flex-1">{files[0].name}</span>
-                    {total > 0 && <span className="text-xs text-slate-400">{total} pages</span>}
-                    <button onClick={() => { setFiles([]); setThumbs([]); }} className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10"><X className="w-4 h-4" /></button>
+                  <div className="space-y-3">
+                    {preview && !needsThumbs && (
+                      <div data-testid="file-preview" className="flex justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] p-3">
+                        <img src={preview} alt="File preview" className="max-h-72 rounded-lg shadow-sm object-contain" />
+                      </div>
+                    )}
+                    <div className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] px-4 py-3">
+                      <Icons.FileText className="w-5 h-5 text-rose-500" />
+                      <span className="text-sm truncate flex-1">{files[0].name}</span>
+                      {total > 0 && <span className="text-xs text-slate-400">{total} pages</span>}
+                      <button onClick={() => { setFiles([]); setThumbs([]); setPreview(null); }} className="p-1.5 rounded-lg text-rose-500 hover:bg-rose-500/10"><X className="w-4 h-4" /></button>
+                    </div>
                   </div>
                 )}
 

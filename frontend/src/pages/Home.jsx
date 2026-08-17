@@ -40,7 +40,7 @@ const Home = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-16 pb-14 sm:pt-24 sm:pb-20">
           <div className="max-w-3xl mx-auto text-center">
             <div className="reveal inline-flex items-center gap-2 rounded-full border border-slate-200 dark:border-white/10 bg-white/70 dark:bg-white/5 px-3.5 py-1.5 text-xs font-semibold text-slate-600 dark:text-slate-300">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> 26 tools · free · private in your browser
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> 30 tools · free · private in your browser
             </div>
             <h1 className="reveal font-display font-extrabold tracking-tight text-4xl sm:text-6xl leading-[1.05] mt-6">
               Every <span className="brand-gradient-text">PDF tool</span> you need,<br className="hidden sm:block" /> in one beautiful place

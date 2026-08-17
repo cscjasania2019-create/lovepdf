@@ -73,6 +73,9 @@ app.include_router(api_router)
 from pdf_tools import router as pdf_router
 app.include_router(pdf_router)
 
+from image_tools import router as image_router
+app.include_router(image_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
