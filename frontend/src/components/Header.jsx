@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import * as Icons from 'lucide-react';
 import { Moon, Sun, Menu, X, FileText, ChevronDown } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
-import { TOOLS, ICON_TILE } from '../mock';
+import { TOOLS, ICON_TILE, CATEGORIES } from '../mock';
 
 export const Logo = ({ compact = false }) => (
   <Link to="/" className="flex items-center gap-2.5 group">
@@ -35,10 +35,10 @@ const DropdownGrid = ({ tools, cols = 'grid-cols-2', width = 'w-[520px]' }) => {
         {tools.map((t) => {
           const Icon = Icons[t.icon] || Icons.FileText;
           return (
-            <button key={t.slug} onClick={() => navigate(`/tool/${t.slug}`)} className="flex items-start gap-3 p-2.5 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
-              <span className={`grid place-items-center w-9 h-9 rounded-lg shrink-0 ${ICON_TILE[t.color] || ICON_TILE.rose}`}><Icon className="w-4.5 h-4.5" /></span>
+            <button key={t.slug} onClick={() => navigate(`/tool/${t.slug}`)} className="group flex items-start gap-3 p-2.5 rounded-xl text-left hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+              <span className={`grid place-items-center w-9 h-9 rounded-lg shrink-0 transition-transform group-hover:scale-110 ${ICON_TILE[t.color] || ICON_TILE.rose}`}><Icon className="w-4.5 h-4.5" /></span>
               <span>
-                <span className="block text-sm font-semibold text-slate-800 dark:text-slate-100">{t.name}</span>
+                <span className="block text-sm font-semibold text-slate-800 dark:text-slate-100 group-hover:text-rose-500 transition-colors">{t.name}</span>
                 <span className="block text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{t.desc}</span>
               </span>
             </button>
@@ -62,6 +62,7 @@ const Header = () => {
   }, []);
 
   const convertTools = TOOLS.filter((t) => t.category === 'convert-to' || t.category === 'convert-from');
+  const imageTools = TOOLS.filter((t) => t.category === 'image');
 
   return (
     <header className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'glass border-b border-slate-200/70 dark:border-white/10 shadow-sm' : 'bg-transparent'}`}>
@@ -78,22 +79,37 @@ const Header = () => {
               </button>
               {menu === 'convert' && <DropdownGrid tools={convertTools} />}
             </div>
+            <div className="relative" onMouseEnter={() => setMenu('image')} onMouseLeave={() => setMenu(null)}>
+              <button data-testid="nav-image-tools" className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                Image Tools
+                <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-rose-500 text-white">New</span>
+                <ChevronDown className={`w-4 h-4 transition-transform ${menu === 'image' ? 'rotate-180' : ''}`} />
+              </button>
+              {menu === 'image' && <DropdownGrid tools={imageTools} cols="grid-cols-1" width="w-[340px]" />}
+            </div>
             <div className="relative" onMouseEnter={() => setMenu('all')} onMouseLeave={() => setMenu(null)}>
               <button className="flex items-center gap-1 px-3 py-2 rounded-lg text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-rose-500 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
                 All PDF Tools <ChevronDown className={`w-4 h-4 transition-transform ${menu === 'all' ? 'rotate-180' : ''}`} />
               </button>
               {menu === 'all' && (
                 <div className="absolute right-0 top-full pt-2 w-[720px]">
-                  <div className="glass rounded-2xl border border-slate-200/70 dark:border-white/10 shadow-2xl p-3 grid grid-cols-3 gap-1 reveal max-h-[70vh] overflow-y-auto">
-                    {TOOLS.map((t) => {
-                      const Icon = Icons[t.icon] || Icons.FileText;
-                      return (
-                        <Link key={t.slug} to={`/tool/${t.slug}`} onClick={() => setMenu(null)} className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
-                          <span className={`grid place-items-center w-8 h-8 rounded-lg shrink-0 ${ICON_TILE[t.color] || ICON_TILE.rose}`}><Icon className="w-4 h-4" /></span>
-                          <span className="text-sm font-medium text-slate-800 dark:text-slate-100">{t.name}</span>
-                        </Link>
-                      );
-                    })}
+                  <div className="glass rounded-2xl border border-slate-200/70 dark:border-white/10 shadow-2xl p-4 reveal max-h-[70vh] overflow-y-auto space-y-3">
+                    {CATEGORIES.filter((c) => c.id !== 'all').map((c) => (
+                      <div key={c.id}>
+                        <p className="px-2 pb-1.5 text-[10px] font-bold uppercase tracking-widest text-rose-500">{c.label}</p>
+                        <div className="grid grid-cols-3 gap-1">
+                          {TOOLS.filter((t) => t.category === c.id).map((t) => {
+                            const Icon = Icons[t.icon] || Icons.FileText;
+                            return (
+                              <Link key={t.slug} to={`/tool/${t.slug}`} onClick={() => setMenu(null)} className="group flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors">
+                                <span className={`grid place-items-center w-8 h-8 rounded-lg shrink-0 transition-transform group-hover:scale-110 ${ICON_TILE[t.color] || ICON_TILE.rose}`}><Icon className="w-4 h-4" /></span>
+                                <span className="text-sm font-medium text-slate-800 dark:text-slate-100 group-hover:text-rose-500 transition-colors">{t.name}</span>
+                              </Link>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               )}

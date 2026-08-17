@@ -80,7 +80,7 @@ const ToolPage = () => {
       if (f.type && f.type.startsWith('image/')) {
         setPreview(URL.createObjectURL(f));
       } else if (/\.pdf$/i.test(f.name || '')) {
-        pdf.renderPageImage(f, 0, 420).then((p) => setPreview(p.dataUrl)).catch(() => {});
+        pdf.renderPageImage(f, 0, 720).then((p) => setPreview(p.dataUrl)).catch(() => {});
       }
       if (!isImageInput && needsThumbs) {
         setBusy(true);
@@ -367,8 +367,8 @@ const ToolPage = () => {
                 {!isMulti && (
                   <div className="space-y-3">
                     {preview && !needsThumbs && (
-                      <div data-testid="file-preview" className="flex justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] p-3">
-                        <img src={preview} alt="File preview" className="max-h-72 rounded-lg shadow-sm object-contain" />
+                      <div data-testid="file-preview" className="flex justify-center rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] p-4">
+                        <img src={preview} alt="File preview" className="max-h-[32rem] w-auto max-w-full rounded-lg shadow-md object-contain" />
                       </div>
                     )}
                     <div className="flex items-center gap-3 rounded-xl border border-slate-200 dark:border-white/10 bg-slate-50 dark:bg-white/[0.02] px-4 py-3">

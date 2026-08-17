@@ -49,14 +49,36 @@ const Home = () => {
               Merge, split, compress, convert and edit your documents in seconds. Fast, secure and delightfully simple — on any device.
             </p>
             <div className="reveal mt-8 max-w-xl mx-auto relative">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+              <Search className="absolute left-4 top-6 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); }}
                 placeholder="Search a tool — merge, split, compress..."
                 className="w-full rounded-2xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/5 pl-12 pr-4 py-4 text-sm outline-none focus:ring-2 focus:ring-rose-400/60 focus:border-rose-300 transition shadow-sm"
-                onFocus={() => document.getElementById('tools')?.scrollIntoView({ behavior: 'smooth' })}
+                data-testid="hero-search-input"
               />
+              {query.trim() && (
+                <div data-testid="search-suggestions" className="absolute left-0 right-0 top-full mt-2 z-30 bg-white dark:bg-[#10141f] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl p-2 text-left max-h-80 overflow-y-auto">
+                  {filtered.length === 0 ? (
+                    <p className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">No tool found for "{query}"</p>
+                  ) : (
+                    filtered.slice(0, 8).map((t) => {
+                      const SIcon = Icons[t.icon] || Icons.FileText;
+                      return (
+                        <button key={t.slug} data-testid={`search-result-${t.slug}`} onClick={() => navigate(`/tool/${t.slug}`)}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-white/5 transition-colors group">
+                          <span className={`grid place-items-center w-9 h-9 rounded-lg shrink-0 ${ICON_TILE[t.color] || ICON_TILE.rose}`}><SIcon className="w-4 h-4" /></span>
+                          <span className="flex-1 min-w-0">
+                            <span className="block text-sm font-semibold text-slate-800 dark:text-slate-100">{t.name}</span>
+                            <span className="block text-xs text-slate-500 dark:text-slate-400 truncate">{t.desc}</span>
+                          </span>
+                          <Icons.ArrowRight className="w-4 h-4 text-rose-500 opacity-0 group-hover:opacity-100 -translate-x-1 group-hover:translate-x-0 transition-all" />
+                        </button>
+                      );
+                    })
+                  )}
+                </div>
+              )}
             </div>
             <div className="reveal mt-8">
               <p className="text-xs font-bold uppercase tracking-widest text-rose-500 mb-4">Most popular tools</p>
